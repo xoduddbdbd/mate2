@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mate – Mobile Prototype (HTML Only)</title>
+  <!-- Tailwind CDN (no build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* iOS-ish safe area + mobile width guide */
+    .app {
+      max-width: 420px; /* iPhone 13 width 390 + 여유 */
+      margin: 0 auto;
+      min-height: 100dvh;
+      background: #f9fafb;
+    }
+    .view { display: none; }
+    .view.active { display: block; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="app" class="app flex flex-col">
+    <!-- Topbar -->
+    <header id="topbar" class="px-4 pt-4 pb-2 bg-white/70 backdrop-blur border-b border-slate-200 sticky top-0 z-10">
+      <div class="text-xl font-semibold">Mate - 가톨릭대학교</div>
+      <label class="mt-3 flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 h-10">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z" /></svg>
+        <input placeholder="장소, 마감, 인원 검색" class="flex-1 outline-none placeholder:text-slate-400" />
+      </label>
+      <!-- chips -->
+      <div id="chips" class="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <!-- aria-pressed 로 선택 상태를 표시, 클릭 시 토글(선택=필터 적용 / 해제=전체 보기) -->
+        <button data-filter="배달"  aria-pressed="false" class="px-3 h-8 rounded-full border border-indigo-600/30 bg-indigo-50 text-indigo-700 text-sm">배달</button>
+        <button data-filter="택시"  aria-pressed="false" class="px-3 h-8 rounded-full border border-slate-200 text-slate-600 text-sm">택시</button>
+        <button data-filter="운동"  aria-pressed="false" class="px-3 h-8 rounded-full border border-slate-200 text-slate-600 text-sm">운동</button>
+        <button data-filter="스터디" aria-pressed="false" class="px-3 h-8 rounded-full border border-slate-200 text-slate-600 text-sm">스터디</button>
+        <button data-filter="OTT"   aria-pressed="false" class="px-3 h-8 rounded-full border border-slate-200 text-slate-600 text-sm">OTT</button>
+      </div>
+    </header>
+
+    <header id="subbar" class="px-4 pt-4 pb-2 bg-white/70 backdrop-blur border-b border-slate-200 sticky top-0 z-10 hidden">
+      <div class="flex items-center gap-2">
+        <!-- 뒤로가기 -->
+        <button id="backBtn" data-back class="-ml-1 p-1.5 rounded-lg hover:bg-slate-100" aria-label="뒤로가기">
+          <svg class="w-6 h-6 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h1 id="subbar-title" class="text-2xl font-bold text-slate-900">제목</h1>
+      </div>
+    </header>
+
+
+    <!-- Views -->
+    <main id="views" class="flex-1 px-4 pt-3 pb-24">
+      <!-- Home -->
+      <section id="home" class="view active space-y-3">
+        <!-- card 1 -->
+        <article data-cat="배달" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-start gap-2">
+            <span class="px-2.5 h-6 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold inline-flex items-center">배달</span>
+          </div>
+          <!-- 제목을 클릭 타깃으로 전환 -->
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"니콜스 4층 버거킹","place":"역곡역","cat":"배달","pay":"현장","body":"메뉴는 자유, 최소금액 맞으면 즉시 주문"}'>
+            니콜스 4층 버거킹
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">역곡역 · 인원미정</p>
+        </article>
+        <!-- card 2 -->
+        <article data-cat="택시" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">택시</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"온수역 → 정문 동승","place":"온수역 2번출구","cat":"택시","pay":"정산안함","body":"같이 탑승하실 분 연락 주세요.","status":"done"}'>
+            온수역 → 정문 동승
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">온수역 2번출구 · 1/3</p>
+        </article>
+        <!-- card 3 -->
+        <article data-cat="운동" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">운동</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"5km 러닝","place":"안양천","cat":"운동","pay":"정산안함","body":"7분 페이스로 천천히 달립니다."}'>
+            5km 러닝
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">안양천 · 3/5</p>
+        </article>
+        <!-- card 4 -->
+        <article data-cat="스터디" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">스터디</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"자료구조 과제 같이 하실 분","place":"도서관 4층","cat":"스터디","pay":"정산안함","body":"파트 분배해서 1~2시간 같이 진행해요."}'>
+            자료구조 과제 같이 하실 분
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">도서관 4층 · 1/4</p>
+        </article>
+        <!-- card 5 -->
+        <article data-cat="OTT" class="bg-white rounded-2xl border border-slate-200 p-4">
+         <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">OTT</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"넷플릭스 프리미엄 2명 구해요","place":"온라인","cat":"OTT","pay":"선결제","body":"프리미엄 4인, 카카오 정산. 규칙 지켜요."}'>
+            넷플릭스 프리미엄 2명 구해요
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">카카오 정산 · 2/4</p>
+        </article>
+        <!-- card 6 -->
+        <article data-cat="배달" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-start justify-between">
+            <span class="px-2.5 h-6 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold inline-flex items-center">배달</span>
+          </div>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"후문 치킨 최소금액 채워요","place":"후문","cat":"배달","pay":"현장","body":"메뉴 자유, 최소금액 맞으면 바로 주문합니다."}'>
+            후문 치킨 최소금액 채워요
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">후문 · 3/5</p>
+        </article>
+        <!-- card 7 -->
+        <article data-cat="택시" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">택시</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"신촌역 → 기숙사 동승 구함","place":"신촌역 3번출구","cat":"택시","pay":"정산안함","body":"같이 타실 분 DM 주세요."}'>
+            신촌역 → 기숙사 동승 구함
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">신촌역 3번출구 · 2/3</p>
+        </article>
+        <!-- card 8 -->
+        <article data-cat="운동" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">운동</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"농구 3:3 바로 하실 분","place":"체육관 A코트","cat":"운동","pay":"정산안함","body":"실내화/수건 지참, 가볍게 게임 돌려요."}'>
+            농구 3:3 바로 하실 분
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">체육관 A코트 · 4/6</p>
+        </article>
+        <!-- card 9 -->
+        <article data-cat="운동" class="bg-white rounded-2xl border border-slate-200 p-4">
+          <span class="px-2.5 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold inline-flex items-center">운동</span>
+          <h3
+            class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+            data-open-detail
+            data-detail='{"title":"이번주 목요일 축구 용병 구함","place":"학교운동장","cat":"운동","pay":"정산안함","body":"저녁 7시 킥오프, 포지션 무관."}'>
+            이번주 목요일 축구 용병 구함
+          </h3>
+          <p class="mt-1 text-sm text-slate-500">학교운동장 · 인원미정</p>
+        </article>
+      </section>
+
+      <!-- Detail -->
+      <section id="detail" class="view" data-user='{"nickname":"후무후무","dept":"컴퓨터공학과","sid":"202512345","gender":"여","battery":50}'>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="aspect-[358/180] bg-slate-100 grid place-items-center">이미지/지도</div>
+          <div class="p-4">
+            <h2 id="detailTitle" class="text-xl font-semibold">제목</h2>
+            <p id="detailPlace" class="mt-1 text-sm text-slate-500"></p>
+            <!-- 작성자 닉네임 (클릭 시 상대 프로필) -->
+            <div class="mt-3 flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-slate-200"></div>
+              <button type="button" id="detailAuthor" data-open-profile="detail"
+                class="text-sm font-semibold text-slate-800 underline-offset-2 hover:underline bg-transparent"></button>
+              <!-- 신고 버튼(상세 화면) -->
+              <button id="detailReportBtn"
+                      type="button"
+                      class="ml-auto h-8 px-3 rounded-lg border border-slate-200 text-xs text-slate-600"
+                      data-open-report>
+                신고
+              </button>
+            </div>
+            <div class="mt-3 flex gap-2">
+              <span id="detailCat" class="px-3 h-7 rounded-full bg-indigo-50 text-indigo-700 text-xs font-semibold inline-flex items-center">분류</span>
+              <span id="detailPay" class="px-3 h-7 rounded-full bg-slate-100 text-slate-600 text-xs inline-flex items-center">정산</span>
+            </div>
+            <p id="detailBody" class="mt-3 text-[15px] leading-6 text-slate-800"></p>
+            <div class="mt-5 grid grid-cols-2 gap-2">
+              <!-- 기본: 참여 신청 (내 글이 아니면 표시) -->
+              <button id="detailCta"
+                      class="col-span-2 h-11 rounded-xl bg-indigo-600 text-white font-semibold">참여 신청</button>
+              <!-- 내 글인 경우에만 표시 -->
+              <button id="detailEdit"
+                      class="hidden h-11 rounded-xl bg-indigo-600 text-white font-semibold">글 수정</button>
+              <button id="detailDelete"
+                      class="hidden h-11 rounded-xl bg-white border border-slate-200">삭제</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Compose -->
+      <section id="compose" class="view">
+        <form id="composeForm" class="bg-white rounded-2xl border border-slate-200 p-4 space-y-4">
+          <div>
+            <label class="text-sm text-slate-500">카테고리</label>
+            <select id="composeCategory" class="mt-1 w-full h-11 border border-slate-200 rounded-xl px-3">
+              <option>배달</option><option>택시</option><option>운동</option><option>스터디</option><option>OTT</option>
+            </select>
+          </div>
+
+          <!-- ▼ 제목 추가 -->
+          <div>
+            <label class="text-sm text-slate-500">제목</label>
+            <input id="composeTitle" placeholder="예: 신촌역 → 학교 택시 동승 구해요"
+                  class="mt-1 w-full h-11 border border-slate-200 rounded-xl px-3" />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-500">장소</label>
+            <input id="composePlace" placeholder="예: 신촌역 2번출구" class="mt-1 w-full h-11 border border-slate-200 rounded-xl px-3" />
+          </div>
+
+          <!-- ▼ 내용 추가 -->
+          <div>
+            <label class="text-sm text-slate-500">내용</label>
+            <textarea id="composeBody" rows="4" placeholder="간단한 설명을 적어주세요."
+                      class="mt-1 w-full border border-slate-200 rounded-xl p-3 text-sm"></textarea>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-500">인원</label>
+            <select id="composePeople" class="mt-1 w-full h-11 border border-slate-200 rounded-xl px-3">
+              <option value="">인원 미정</option>
+              <option value="2">2명</option>
+              <option value="3">3명</option>
+              <option value="4" selected>4명</option>
+              <option value="5">5명</option>
+              <option value="6">6명</option>
+              <option value="7">7명</option>
+              <option value="8">8명</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-500">정산 방식</label>
+            <select id="composePay" class="mt-1 w-full h-11 border border-slate-200 rounded-xl px-3">
+              <option>현장</option><option>선결제</option><option>송금</option><option>정산안함</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full h-11 rounded-xl bg-indigo-600 text-white font-semibold">등록</button>
+
+        </form>
+      </section>
+
+      <!-- Chat -->
+      <section id="chat" class="view">
+        <div class="space-y-3">
+          <div class="max-w-[80%] bg-white border border-slate-200 rounded-2xl px-3 py-2">안녕하세요! 주문 참여합니다.</div>
+          <div class="ml-auto max-w-[80%] bg-indigo-600 text-white rounded-2xl px-3 py-2">넵, 마감 16:30 입니다.</div>
+          <div class="max-w-[80%] bg-white border border-slate-200 rounded-2xl px-3 py-2">픽업은 어디서 할까요?</div>
+        </div>
+        <div class="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[420px] px-4">
+          <!-- 입력 박스를 약간 작게 + 왼쪽 장식 말풍선과 간섭 없도록 오른쪽으로 띄움 -->
+          <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-3 py-2 ml-6 shadow-sm">
+            <input class="flex-1 h-9 outline-none placeholder-slate-400 text-[15px]" placeholder="메시지 입력..." />
+            <button class="h-9 px-3 rounded-full bg-indigo-600 text-white font-semibold text-[15px]">전송</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Meet (약속) -->
+      <section id="meet" class="view space-y-3">
+        <h2 class="sr-only">약속</h2>
+        <!-- upcoming card -->
+        <article class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">버거킹 같이주문</h3>
+            <span class="px-2 h-6 rounded-full bg-emerald-50 text-emerald-600 text-xs font-medium inline-flex items-center">확정</span>
+          </div>
+          <p class="mt-1 text-sm text-slate-500">오늘 16:30 · 역곡역 · 4명</p>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button data-goto="chat" class="h-10 rounded-xl bg-slate-100 text-slate-700">채팅 이동</button>
+            <button data-meet-done class="h-10 rounded-xl bg-emerald-600 text-white font-semibold">완료 처리</button>
+          </div>
+        </article>
+        <!-- pending card -->
+        <article class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold">온수역 → 정문 동승</h3>
+            <span class="px-2 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-medium inline-flex items-center">완료</span>
+          </div>
+          <p class="mt-1 text-sm text-slate-500">온수역 2번출구 · 3명</p>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <button
+              class="h-10 rounded-xl bg-slate-100 text-slate-700"
+              data-open-detail
+              data-detail='{"title":"온수역 → 정문 동승","place":"온수역 2번출구","cat":"택시","pay":"정산안함","body":"같이 탑승하실 분 연락 주세요.","status":"done"}'>
+              상세 보기
+            </button>
+            <!-- 완료 처리된 약속: 취소 → 후기 남기기 -->
+            <button
+              class="h-10 rounded-xl bg-white border border-slate-200"
+              data-open-review
+              data-user='{"nickname":"후무후무","dept":"컴퓨터공학과","sid":"202512345","gender":"여","battery":50}'>
+              후기 남기기
+            </button>
+          </div>
+        </article>
+        <!-- done card (완료) -->
+        <article class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-center justify-between">
+           <h3 class="text-lg font-semibold">도림천 러닝팟</h3>
+           <span class="px-2 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-medium inline-flex items-center">완료</span>
+          </div>
+          <p class="mt-1 text-sm text-slate-500">신도림 1번 출구 · 5명</p>
+          <div class="mt-3 grid grid-cols-2 gap-2">
+            <!-- ▼ 후기 작성 화면으로 이동할 때, 대상 사용자 정보를 data-user로 전달 -->
+            <button
+              class="h-10 rounded-xl bg-slate-100 text-slate-700"
+              data-open-detail
+              data-detail='{"title":"도림천 러닝팟","place":"신도림 1번 출구","cat":"운동","pay":"정산안함","body":"7분 페이스, 10키로 러닝 예정","status":"done"}'>
+              상세 보기
+            </button>
+            <button 
+            class="h-10 rounded-xl bg-white border border-slate-200"
+            data-open-review
+            data-user='{"nickname":"후무후무","dept":"컴퓨터공학과","sid":"202512345","gender":"여","battery":50}'>
+            후기 남기기</button>
+          </div>
+       </article>
+      </section>
+
+      <!-- Review (후기 작성) -->
+      <section id="review" class="view">
+        <form id="reviewWrite" class="bg-white rounded-2xl border border-slate-200 p-4 space-y-4">
+          <div>
+            <div class="text-sm text-slate-500">대상</div>
+            <div id="reviewTarget" class="mt-1 text-base font-semibold">-</div>
+          </div>
+
+          <!-- 별점: 0~5점 -->
+          <div>
+           <div class="text-sm text-slate-500">별점(0–5)</div>
+           <div id="stars" class="mt-2 flex items-center gap-1 text-2xl">
+             <button type="button" class="px-1" data-star="1" aria-pressed="false">☆</button>
+             <button type="button" class="px-1" data-star="2" aria-pressed="false">☆</button>
+             <button type="button" class="px-1" data-star="3" aria-pressed="false">☆</button>
+             <button type="button" class="px-1" data-star="4" aria-pressed="false">☆</button>
+             <button type="button" class="px-1" data-star="5" aria-pressed="false">☆</button>
+             <button type="button" class="ml-2 text-xs px-2 py-1 border rounded" data-star="0">0점</button>
+           </div>
+           <input id="starValue" type="hidden" value="0" />
+          </div>
+
+          <!-- 코멘트 -->
+          <div>
+            <div class="text-sm text-slate-500">코멘트(선택)</div>
+            <textarea id="reviewComment" rows="4" placeholder="짧은 코멘트 (공개)"
+              class="mt-2 w-full border border-slate-200 rounded-xl p-3 text-sm"></textarea>
+          </div>
+
+          <button type="submit" data-review-submit
+           class="w-full h-11 rounded-xl bg-indigo-600 text-white font-semibold">
+           후기 남기기
+          </button>
+          <p class="text-xs text-slate-500">별점은 배터리에 반영되고, 코멘트는 상대 프로필에 공개됩니다.</p>
+        </form>
+      </section>
+
+      <!-- Profile (내 프로필) -->
+      <section id="profile" class="view space-y-4">
+        <!-- 헤더 카드 -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-slate-200"></div>
+            <div>
+              <div class="text-base font-semibold"><span id="nickname" class="text-slate-900">수업일찍끝내조</span></div>
+            </div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div><span class="text-slate-500">학과</span><div id="dept" class="font-medium">컴퓨터공학과</div></div>
+            <div><span class="text-slate-500">학번</span><div id="sid" class="font-medium">202512345</div></div>
+            <div><span class="text-slate-500">성별</span><div id="gender" class="font-medium">여</div></div>
+          </div>
+          <!-- 배터리 평판 -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm text-slate-500">배터리(평판)</span>
+              <span id="batteryPct" class="text-sm font-semibold text-slate-800">50%</span>
+            </div>
+            <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div id="batteryBar" class="h-full rounded-full bg-emerald-500" style="width:50%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 후기 남기기 (별점 5점, 코멘트 선택) -->
+        <form id="reviewForm" class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="text-sm text-slate-600">후기 남기기(선택)</label>
+            <select id="rating" class="h-9 border border-slate-200 rounded-lg px-2 text-sm">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3" selected>★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+          <textarea id="comment" rows="3" placeholder="짧은 코멘트 (공개) – 선택 입력" class="w-full border border-slate-200 rounded-xl p-3 text-sm"></textarea>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="submit" data-mode="stars" class="h-10 rounded-xl bg-indigo-600 text-white font-semibold">별점만 등록</button>
+            <button type="submit" data-mode="stars+comment" class="h-10 rounded-xl bg-white border border-slate-200">별점+코멘트 등록</button>
+          </div>
+          <p class="text-xs text-slate-500">좋은 후기는 배터리가 충전되고, 나쁜 후기는 배터리가 소모됩니다. (0–100%)</p>
+        </form>
+
+        <!-- 공개 코멘트 리스트 -->
+        <div class="bg-white rounded-2xl border border-slate-200">
+          <div class="px-4 py-3 border-b border-slate-200 text-sm font-semibold">공개 코멘트</div>
+          <div id="publicComments" class="p-4 space-y-3 text-sm">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200"><span class="font-medium">★★★★★</span> 시간 약속 잘 지키고 친절했어요.</div>
+          </div>
+        </div>
+
+        <!-- 설정/기타 -->
+        <div class="bg-white rounded-2xl border border-slate-200 divide-y">
+          <button class="w-full text-left px-4 py-3">내 글/참여 내역</button>
+          <button class="w-full text-left px-4 py-3">알림 설정</button>
+          <button class="w-full text-left px-4 py-3">차단/신고 관리</button>
+          <button class="w-full text-left px-4 py-3">로그아웃</button>
+        </div>
+      </section>
+
+      <!-- Public Profile (상대방 프로필) -->
+      <section id="profile-public" class="view space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-slate-200"></div>
+            <div>
+              <div id="pubNickname" class="text-base font-semibold">닉네임</div>
+            </div>
+          </div>
+          <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+            <div><span class="text-slate-500">학과</span><div id="pubDept" class="font-medium">-</div></div>
+            <div><span class="text-slate-500">학번</span><div id="pubSid" class="font-medium">-</div></div>
+            <div><span class="text-slate-500">성별</span><div id="pubGender" class="font-medium">-</div></div>
+          </div>
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm text-slate-500">배터리(평판)</span>
+              <span id="pubBatteryPct" class="text-sm font-semibold text-slate-800">-</span>
+            </div>
+            <div class="h-3 bg-slate-100 rounded-full overflow-hidden">
+              <div id="pubBatteryBar" class="h-full rounded-full bg-emerald-500" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button id="pubReportBtn"
+                    type="button"
+                    class="h-9 px-3 rounded-lg border border-slate-200 text-sm"
+                    data-open-report>
+              신고하기
+            </button>
+            <button id="pubBlockBtn"
+                    type="button"
+                    class="h-9 px-3 rounded-lg border border-slate-200 text-sm">
+              차단
+            </button>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200">
+          <div class="px-4 py-3 border-b border-slate-200 text-sm font-semibold">공개 코멘트</div>
+          <div id="pubComments" class="p-4 space-y-3 text-sm">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">아직 코멘트가 없습니다.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Report (신고) -->
+      <section id="report" class="view">
+        <form id="reportForm" class="bg-white rounded-2xl border border-slate-200 p-4 space-y-4">
+          <div>
+            <div class="text-sm text-slate-500">신고 대상</div>
+            <div id="reportTarget" class="mt-1 text-base font-semibold">-</div>
+          </div>
+
+          <fieldset class="space-y-2">
+            <legend class="text-sm text-slate-500">신고 사유</legend>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" name="reason" value="스팸" checked> 스팸/홍보</label>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" name="reason" value="욕설"> 욕설/혐오</label>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" name="reason" value="사기"> 사기/금전 문제</label>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" name="reason" value="부적절"> 부적절한 콘텐츠</label>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" name="reason" value="기타"> 기타</label>
+          </fieldset>
+
+          <div>
+            <div class="text-sm text-slate-500">추가 설명(선택)</div>
+            <textarea id="reportNotes" rows="4" class="mt-2 w-full border border-slate-200 rounded-xl p-3 text-sm"
+                      placeholder="상세 내용을 적어주세요."></textarea>
+          </div>
+
+          <label class="flex items-center gap-2 text-sm">
+            <input id="reportBlock" type="checkbox"> 이 사용자 차단하기
+          </label>
+
+          <button type="submit" class="w-full h-11 rounded-xl bg-indigo-600 text-white font-semibold">신고 제출</button>
+          <p class="text-xs text-slate-500">허위 신고 시 제재될 수 있습니다.</p>
+        </form>
+      </section>
+
+    </main>
+
+    <!-- Tabbar -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[420px] bg-white border-t border-slate-200">
+      <ul class="grid grid-cols-5 h-16 text-xs text-slate-600">
+        <li><button data-goto="home" class="w-full h-full flex flex-col items-center justify-center gap-1 aria-[current=page]:text-indigo-600" aria-current="page"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M4 10v10a2 2 0 002 2h12a2 2 0 002-2V10"/></svg>홈</button></li>
+        <li><button data-goto="compose" class="w-full h-full flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>글쓰기</button></li>
+        <li><button data-goto="chat" class="w-full h-full flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h6m-9 8l-3 3V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H7z"/></svg>채팅</button></li>
+        <li><button data-goto="meet" class="w-full h-full flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 13h18M5 7h14M7 17h10"/></svg>약속</button></li>
+        <li><button data-goto="profile" class="w-full h-full flex flex-col items-center justify-center gap-1"><svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A4 4 0 018 17h8a4 4 0 012.879 1.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>프로필</button></li>
+      </ul>
+    </nav>
+  </div>
+
+  <script>
+    // --- Very simple router for prototype + profile reputation logic ---
+    const views = document.querySelectorAll('.view');
+    // 화면 이동 스택 (뒤로가기용)
+    let navStack = [];
+    // 상세를 연 카드 참조(홈 카드 편집용)
+    let currentDetailCard = null;
+    // 편집 모드 플래그/페이로드
+    let isEditing = false;
+    let editPayload = null;
+
+    function show(id, fromBack = false){
+      const currentView = document.querySelector('.view.active');
+      const currentId = currentView ? currentView.id : null;
+
+      // 뒤로가기가 아닌 정상 이동이면 현재 화면을 스택에 저장
+      if (currentId && currentId !== id && !fromBack) {
+        navStack.push(currentId);
+      }
+
+      // 뷰 토글
+      views.forEach(v=>v.classList.toggle('active', v.id===id));
+      document.querySelectorAll('[data-goto]').forEach(b=>{
+        b.setAttribute('aria-current', b.getAttribute('data-goto')===id ? 'page' : 'false');
+      });
+
+      const topbar   = document.getElementById('topbar');
+      const subbar   = document.getElementById('subbar');
+      const subTitle = document.getElementById('subbar-title');
+
+      const TITLES = {
+        compose: '글쓰기',
+        chat: '채팅',
+        meet: '약속',
+        profile: '프로필',
+        detail: '상세',
+        review: '후기',
+        'profile-public': '프로필'
+      };
+
+      if (id === 'home') {
+        topbar?.classList.remove('hidden');
+        subbar?.classList.add('hidden');
+      } else {
+        topbar?.classList.add('hidden');
+        if (subbar) {
+          subbar.classList.remove('hidden');
+          if (subTitle) subTitle.textContent = TITLES[id] ?? '';
+        }
+      }
+      if (id === 'home') applyBlockFilter(); // ← 차단 목록 적용(선택 사항)
+    }
+
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('[data-goto]');
+      if(!btn) return;
+      e.preventDefault();
+      show(btn.getAttribute('data-goto'));
+    });
+
+    // ===== 카테고리 칩 필터 =====
+    (function(){
+      const chipsWrap = document.getElementById('chips');
+      const home = document.getElementById('home');
+
+      // 칩 스타일 토글
+      function setChipActive(btn, active){
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        // 선택 시 보라색 계열, 해제 시 회색 계열
+        if (active) {
+          btn.classList.remove('border-slate-200','text-slate-600','bg-white');
+          btn.classList.add('border-indigo-600/30','bg-indigo-50','text-indigo-700');
+        } else {
+          btn.classList.remove('border-indigo-600/30','bg-indigo-50','text-indigo-700');
+          btn.classList.add('border-slate-200','text-slate-600','bg-white');
+        }
+      }
+
+      // 실제 필터 적용
+      function applyFilter(cat){ // cat=null 이면 전체 보기
+        const cards = home.querySelectorAll('article[data-cat]');
+        cards.forEach(card=>{
+          const show = !cat || card.dataset.cat === cat;
+          card.classList.toggle('hidden', !show);
+        });
+      }
+
+      // 클릭 이벤트 위임
+      chipsWrap?.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-filter]');
+        if (!btn) return;
+        const nowPressed = btn.getAttribute('aria-pressed') === 'true';
+        const newPressed = !nowPressed;
+
+        // 모든 칩 해제
+        chipsWrap.querySelectorAll('[data-filter]').forEach(b=>setChipActive(b,false));
+
+        // 누른 칩만 토글 상태로
+        setChipActive(btn, newPressed);
+
+        // 필터 적용: 해제면 전체 보기
+        const cat = newPressed ? btn.dataset.filter : null;
+        applyFilter(cat);
+      });
+
+      // 초기 상태: 전체 보기
+      applyFilter(null);
+    })();
+
+
+    // 뒤로가기 버튼: 스택에서 하나 꺼내 돌아가기
+    document.addEventListener('click', (e)=>{
+      const back = e.target.closest('[data-back]');
+      if (!back) return;
+      e.preventDefault();
+      // 스택이 비어 있으면 홈으로
+      const prev = navStack.pop() || 'home';
+      show(prev, true); // fromBack = true
+    });
+
+    // --- Compose: 등록 처리(홈 피드에 카드 추가) ---
+    document.getElementById('composeForm')?.addEventListener('submit', (e)=>{
+      e.preventDefault();
+
+      const cat   = document.getElementById('composeCategory').value.trim();
+      const title = (document.getElementById('composeTitle').value || '').trim();
+      const place = (document.getElementById('composePlace').value || '').trim();
+      const body  = (document.getElementById('composeBody').value || '').trim();
+      const peopleRaw = document.getElementById('composePeople').value; // '' | '2' | … | '8'
+      const pay   = document.getElementById('composePay').value || '현장';
+
+      /* ===== [PATCH-6] 편집 모드면 기존 카드 업데이트 후 종료 ===== */
+      if (isEditing && editPayload?.card) {
+        const card = editPayload.card;
+
+        // 1) 제목/상세 데이터 갱신
+        const h3 = card.querySelector('h3[data-open-detail]');
+        if (h3) {
+          const updatedDetail = {
+            title, place, cat, pay, body,
+            author: (document.getElementById('nickname')?.textContent?.trim() || '나'),
+            authorUser: {
+              nickname: document.getElementById('nickname')?.textContent?.trim() || '나',
+              dept:     document.getElementById('dept')?.textContent?.trim() || '',
+              sid:      document.getElementById('sid')?.textContent?.trim() || '',
+              gender:   document.getElementById('gender')?.textContent?.trim() || '',
+              battery
+            }
+          };
+          h3.textContent = title;
+          h3.setAttribute('data-detail', JSON.stringify(updatedDetail).replace(/'/g,"&apos;"));
+        }
+
+        // 2) 부제(장소/인원) 라인 갱신
+        const sub = card.querySelector('p.mt-1.text-sm.text-slate-500');
+        if (sub) {
+          const afterDot = (sub.textContent || '').split('·').slice(1).join('·').trim(); // 기존 인원표시 보존
+          sub.textContent = afterDot ? `${place} · ${afterDot}` : place;
+        }
+
+        // 3) 카테고리 칩 텍스트만 갱신(색상 유지)
+        const catChip = card.querySelector('span.px-2\\.5.h-6, span.px-2\\.5.h-6.rounded-full');
+        if (catChip) catChip.textContent = cat;
+
+        // 편집 상태 초기화
+        isEditing = false;
+        editPayload = null;
+        currentDetailCard = null;
+
+        // 폼 리셋 + 홈으로
+        (e.target)?.reset();
+        show('home');
+        alert('수정이 완료되었습니다.');
+        return; // ← 새 카드 생성 로직 건너뜀
+      } 
+
+      // 내 프로필(상단 '프로필' 섹션)에서 작성자 정보 읽기
+      const me = {
+        nickname: document.getElementById('nickname')?.textContent?.trim() || '나',
+        dept:     document.getElementById('dept')?.textContent?.trim() || '',
+        sid:      document.getElementById('sid')?.textContent?.trim() || '',
+        gender:   document.getElementById('gender')?.textContent?.trim() || '',
+        battery   // 위에서 선언된 let battery 값을 재사용(기본 50%)
+      };
+
+      // 간단 검증: 제목/장소 최소 입력
+      if (!title) { alert('제목을 입력해 주세요.'); return; }
+      if (!place) { alert('장소를 입력해 주세요.'); return; }
+
+      // 본문 미리보기(최대 60자)
+      const preview = body ? (body.length > 60 ? body.slice(0,60) + '…' : body) : '';
+
+      // 인원 표기: 미정이면 텍스트, 지정이면 1/N
+      const peopleLabel = peopleRaw ? `1/${peopleRaw}` : '인원 미정';
+
+      // 카테고리 라벨 색상 맵
+      const catStyles = {
+        '배달': 'bg-indigo-50 text-indigo-700',
+        '택시': 'bg-slate-100 text-slate-700',
+        '운동': 'bg-slate-100 text-slate-700',
+        '스터디': 'bg-slate-100 text-slate-700',
+        'OTT':  'bg-slate-100 text-slate-700'
+      };
+      const catClass = catStyles[cat] || 'bg-slate-100 text-slate-700';
+
+      // 홈 섹션에 카드 추가
+      const home = document.getElementById('home');
+      const card = document.createElement('article');
+      card.setAttribute('data-cat', cat); // ← 추가
+      card.className = 'bg-white rounded-2xl border border-slate-200 p-4';
+      const detailJson = JSON.stringify({
+        title, place, cat, pay, body,
+        author: me.nickname,   // 상세 화면 작성자명
+        authorUser: me         // 상세에서 프로필 열 때 쓸 전체 정보
+        // status: 'done'      // (필요 시 유지)
+      });
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <span class="px-2.5 h-6 rounded-full ${catClass} text-xs font-semibold inline-flex items-center">${cat}</span>
+          <span class="px-2 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-medium inline-flex items-center">${pay}</span>
+        </div>
+        <h3
+          class="mt-2 text-lg font-semibold text-left cursor-pointer hover:underline"
+          data-open-detail
+          data-detail='${detailJson.replace(/'/g,"&apos;")}'>
+          ${title}
+        </h3>
+        <p class="mt-1 text-sm text-slate-500">${place} · ${peopleLabel}</p>
+        ${ preview ? `<p class="mt-1 text-sm text-slate-500">${preview}</p>` : '' }
+        <!-- 상세 보기 버튼 제거 -->
+      `;
+      home?.prepend(card);
+
+      // 폼 리셋
+      (e.target)?.reset();
+
+      // 홈으로 이동 + 상단바 복귀
+      show('home');
+
+      // 안내 토스트(간단)
+      setTimeout(()=>alert('등록이 완료되었습니다.'), 0);
+    });
+
+    // --- Profile: battery(reputation) ---
+    let battery = 50; // 기본값 50%
+    const batteryPct = document.getElementById('batteryPct');
+    const batteryBar = document.getElementById('batteryBar');
+    function setBattery(v){
+      battery = Math.max(0, Math.min(100, Math.round(v)));
+      batteryPct.textContent = battery + '%';
+      batteryBar.style.width = battery + '%';
+      // 색상: 0-30 red, 30-70 amber, 70-100 green
+      batteryBar.classList.remove('bg-red-500','bg-amber-500','bg-emerald-500');
+      if(battery < 30) batteryBar.classList.add('bg-red-500');
+      else if(battery < 70) batteryBar.classList.add('bg-amber-500');
+      else batteryBar.classList.add('bg-emerald-500');
+    }
+    setBattery(battery);
+
+    // 내 프로필 학번 표기(YY학번)로 변환
+    try {
+      const sidEl = document.getElementById('sid');
+      if (sidEl) sidEl.textContent = formatSid(sidEl.textContent);
+    } catch(e){}
+
+    // 리뷰 제출 이벤트: 별점만 / 별점+코멘트
+    const form = document.getElementById('reviewForm');
+    const ratingSel = document.getElementById('rating');
+    const commentEl = document.getElementById('comment');
+    const commentsBox = document.getElementById('publicComments');
+
+    form?.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[type="submit"]');
+      if(!btn) return;
+      e.preventDefault();
+      const rating = Number(ratingSel.value);
+      // 배터리 가중치: 1→-10, 2→-5, 3→0, 4→+5, 5→+10
+      const deltaMap = {1:-10, 2:-5, 3:0, 4:+5, 5:+10};
+      setBattery(battery + (deltaMap[rating] ?? 0));
+      if(btn.dataset.mode === 'stars+comment'){
+        const txt = (commentEl.value || '').trim();
+        if(txt){
+          const item = document.createElement('div');
+          item.className = 'p-3 rounded-xl bg-slate-50 border border-slate-200';
+          item.innerHTML = `<span class="font-medium">${'★'.repeat(rating)}${'☆'.repeat(5-rating)}</span> ${txt}`;
+          commentsBox.prepend(item);
+          commentEl.value='';
+        }
+      }
+    });
+
+    // ▼ 약속: 완료 처리(배지를 '완료'로 전환)
+    document.addEventListener('click', (e)=>{
+      const doneBtn = e.target.closest('[data-meet-done]');
+      if(!doneBtn) return;
+      e.preventDefault();
+
+      // 현재 카드(article)에서 상태 배지(span)를 찾아 텍스트/색상 변경
+      const card = doneBtn.closest('article');
+      if(!card) return;
+      const badge = card.querySelector('span.px-2.h-6'); // 상태 배지 셀렉터(현 구조 기준)
+      if(badge){
+        badge.textContent = '완료';
+        badge.className = 'px-2 h-6 rounded-full bg-slate-100 text-slate-600 text-xs font-medium inline-flex items-center';
+      }
+
+      // 버튼도 비활성/완료됨 표시(선택)
+      doneBtn.textContent = '완료됨';
+      doneBtn.disabled = true;
+      doneBtn.classList.remove('bg-emerald-600','text-white');
+      doneBtn.classList.add('bg-slate-100','text-slate-600');
+    });
+
+    // ===== Review Flow =====
+    let reviewTarget = null; // {nickname, dept, sid, gender, battery, manner}
+
+    // 4-1) 완료 카드의 [후기 남기기] 클릭 시, 대상 세팅 후 review 화면으로 이동
+    document.addEventListener('click', (e)=>{
+      const openBtn = e.target.closest('[data-open-review]');
+      if(!openBtn) return;
+      e.preventDefault();
+
+      try {
+        reviewTarget = JSON.parse(openBtn.getAttribute('data-user') || '{}');
+      } catch { reviewTarget = {}; }
+
+      // 대상 표시
+      const nick = reviewTarget?.nickname || '알 수 없음';
+      const trg = document.getElementById('reviewTarget');
+      if (trg) trg.textContent = nick;
+
+      // 별점 초기화(0점)
+      setStars(0);
+
+      // 화면 전환
+      show('review');
+    });
+
+    // 4-2) 별점 클릭(토글)
+    function setStars(n){
+      const hidden = document.getElementById('starValue');
+      if (hidden) hidden.value = String(n);
+      document.querySelectorAll('#stars [data-star]').forEach(btn=>{
+        const v = Number(btn.dataset.star);
+        if (v >= 1 && v <= 5) {
+          // 꽉찬/빈 별 표시
+          btn.textContent = (v <= n) ? '★' : '☆';
+          btn.setAttribute('aria-pressed', (v <= n).toString());
+        }
+      });
+    }
+    document.addEventListener('click', (e)=>{
+      const starBtn = e.target.closest('#stars [data-star]');
+      if(!starBtn) return;
+      e.preventDefault();
+      setStars(Number(starBtn.dataset.star));
+    });
+
+    // 4-3) 후기 제출 -> 대상 배터리 갱신 + 상대 프로필에 코멘트 추가 -> 상대 프로필 화면으로 이동
+    document.getElementById('reviewWrite')?.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      if(!reviewTarget) return;
+
+      const rating = Number(document.getElementById('starValue')?.value || '0'); // 0~5
+      const comment = (document.getElementById('reviewComment')?.value || '').trim();
+
+      // 배터리 변화량(0점은 -15으로 가정)
+      const deltaMap = {0:-15, 1:-10, 2:-5, 3:0, 4:+5, 5:+10};
+      const current = reviewTarget.battery ?? 60;
+      const nextBattery = Math.max(0, Math.min(100, Math.round(current + (deltaMap[rating] ?? 0))));
+      reviewTarget.battery = nextBattery;
+
+      // 상대 프로필 열면서 배터리/정보 갱신
+      if (typeof openUserProfile === 'function') {
+        openUserProfile(reviewTarget);
+      }
+
+      // 코멘트 반영(있을 때만)
+      const box = document.getElementById('pubComments');
+      if (box && (comment || rating >= 0)) {
+        // 첫 코멘트 안내 제거
+        if (box.firstElementChild && box.firstElementChild.textContent.includes('아직 코멘트가 없습니다.')) {
+          box.firstElementChild.remove();
+        }
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl bg-slate-50 border border-slate-200';
+        const stars = (rating > 0) ? '★'.repeat(rating) + '☆'.repeat(5-rating) : '0/5';
+        item.innerHTML = `<span class="font-medium">${stars}</span> ${comment ? comment : ''}`;
+        box.prepend(item);
+      }
+
+      // 입력값 초기화
+      setStars(0);
+      const cmt = document.getElementById('reviewComment');
+      if (cmt) cmt.value = '';
+    });
+
+    // --- Detail: data-open-detail 버튼 클릭 시 상세 화면 구성/이동 ---
+    (function(){
+      const catStyle = {
+        '배달':  {chip:'bg-indigo-50 text-indigo-700'},
+        '택시':  {chip:'bg-slate-100 text-slate-700'},
+        '운동':  {chip:'bg-slate-100 text-slate-700'},
+        '스터디':{chip:'bg-slate-100 text-slate-700'},
+        'OTT':   {chip:'bg-slate-100 text-slate-700'}
+      };
+
+      function renderDetail(d){
+        // 텍스트
+        document.getElementById('detailTitle').textContent = d.title || '제목 없음';
+        document.getElementById('detailPlace').textContent = d.place || '';
+        document.getElementById('detailBody').textContent  = d.body || '';
+
+        // 카테고리 칩
+        const catEl = document.getElementById('detailCat');
+        catEl.textContent = d.cat || '기타';
+        catEl.className = `px-3 h-7 rounded-full text-xs font-semibold inline-flex items-center ${(catStyle[d.cat]?.chip || 'bg-slate-100 text-slate-700')}`;
+
+        // 작성자 표시 + 프로필 데이터 세팅
+        const authorBtn = document.getElementById('detailAuthor');
+        if (authorBtn) {
+          // 1) 버튼에 작성자명 표시
+          authorBtn.textContent = d.author || '작성자';
+        }
+
+        // 2) 상세 화면에서 프로필 열기(target user) 정보 주입
+        const detailEl = document.getElementById('detail');
+        if (detailEl) {
+          // 작성자 전체 정보(authorUser)가 넘어오면 그걸 사용,
+          // 없으면 내 프로필 값을 바탕으로 최소 구조를 만들어 전달
+          const userForProfile = d.authorUser || {
+            nickname: d.author || document.getElementById('nickname')?.textContent?.trim() || '작성자',
+            dept:     document.getElementById('dept')?.textContent?.trim() || '',
+            sid:      document.getElementById('sid')?.textContent?.trim() || '',
+            gender:   document.getElementById('gender')?.textContent?.trim() || '',
+            battery   // 상단에서 선언한 전역 battery 값(기본 50%)
+          };
+          detailEl.dataset.user = JSON.stringify(userForProfile);
+        }
+
+        // 신고 버튼에 대상 사용자 정보 싣기
+        const rptBtn = document.getElementById('detailReportBtn');
+        if (rptBtn && detailEl?.dataset?.user) {
+          rptBtn.setAttribute('data-user', detailEl.dataset.user);
+        }
+
+        // 정산 칩
+        const payEl = document.getElementById('detailPay');
+        payEl.textContent = d.pay || '정산안함';
+        payEl.className = 'px-3 h-7 rounded-full bg-slate-100 text-slate-600 text-xs inline-flex items-center';
+
+        const cta = document.getElementById('detailCta');
+        if (cta) {
+          const isDone = (d.status === 'done' || d.status === 'closed');
+          cta.textContent = isDone ? '마감' : '참여 신청';
+          cta.className = isDone
+            ? 'mt-5 w-full h-11 rounded-xl bg-slate-200 text-slate-500 font-semibold cursor-not-allowed'
+            : 'mt-5 w-full h-11 rounded-xl bg-indigo-600 text-white font-semibold';
+          cta.disabled = isDone;
+        }
+
+        // === 내 글이면 [참여 신청] 숨기고 [글 수정]/[삭제]만 노출 ===
+        const myNick = document.getElementById('nickname')?.textContent?.trim();
+
+        const isMine =
+          (!!d?.author && d.author === myNick) ||
+          (!!d?.authorUser?.nickname && d.authorUser.nickname === myNick);
+
+        // 버튼 참조
+        const ctaBtn  = document.getElementById('detailCta');    // 참여 신청
+        const editBtn = document.getElementById('detailEdit');   // 글 수정
+        const delBtn  = document.getElementById('detailDelete'); // 삭제
+
+        if (isMine) {
+          // 내 글 → 참여신청 완전 숨김
+          if (ctaBtn) {
+            ctaBtn.classList.add('hidden');
+            ctaBtn.disabled = true;
+            ctaBtn.setAttribute('aria-hidden', 'true');
+          }
+          editBtn?.classList.remove('hidden');
+          delBtn?.classList.remove('hidden');
+        } else {
+          // 남의 글 → 참여신청 노출, 수정/삭제 숨김
+          editBtn?.classList.add('hidden');
+          delBtn?.classList.add('hidden');
+          if (ctaBtn && !ctaBtn.disabled) {
+            ctaBtn.classList.remove('hidden');
+            ctaBtn.removeAttribute('aria-hidden');
+          }
+        }
+      }
+
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-open-detail]');
+        if(!btn) return;
+        e.preventDefault();
+
+        // 이 상세가 홈의 어떤 카드에서 열렸는지 기억(수정/삭제 대상)
+        currentDetailCard = btn.closest('article') || null;
+
+        let data = {};
+        try { data = JSON.parse(btn.getAttribute('data-detail') || '{}'); } catch {}
+        renderDetail(data);
+        show('detail');
+      });
+
+    })();
+
+    /* ===== [PATCH-5] 글 수정/삭제 이벤트 ===== */
+
+    // 글 수정 버튼 → 글쓰기 화면에 값 채워 열기
+    document.getElementById('detailEdit')?.addEventListener('click', ()=>{
+      if (!currentDetailCard) return;
+
+      const h3 = currentDetailCard.querySelector('h3[data-open-detail]');
+      if (!h3) return;
+
+      let detailData = {};
+      try { detailData = JSON.parse(h3.getAttribute('data-detail') || '{}'); } catch {}
+
+      const fCat   = document.getElementById('composeCategory');
+      const fTitle = document.getElementById('composeTitle');
+      const fPlace = document.getElementById('composePlace');
+      const fBody  = document.getElementById('composeBody');
+      const fPay   = document.getElementById('composePay');
+
+      if (fCat)   fCat.value   = detailData.cat   || fCat.value;
+      if (fTitle) fTitle.value = detailData.title || '';
+      if (fPlace) fPlace.value = detailData.place || '';
+      if (fBody)  fBody.value  = detailData.body  || '';
+      if (fPay)   fPay.value   = detailData.pay   || fPay.value;
+
+      // 편집 플래그/페이로드
+      isEditing = true;
+      editPayload = { card: currentDetailCard };
+
+      show('compose');
+    });
+
+    // 삭제 버튼 → 카드 제거 후 홈으로
+    document.getElementById('detailDelete')?.addEventListener('click', ()=>{
+      if (!currentDetailCard) return;
+      if (!confirm('이 글을 삭제할까요?')) return;
+      currentDetailCard.remove();
+      currentDetailCard = null;
+      show('home');
+    });
+  </script>
+
+  <script>
+    // 상대 프로필 열기(상세 닉네임 버튼)
+    const detail = document.getElementById('detail');
+
+    function formatSid(s){
+      try { s = String(s); } catch(e){ return '-'; }
+      // 예: 202512345 => '25학번'
+      if (s.length >= 4) return s.slice(2,4) + '학번';
+      if (s.length >= 2) return s.slice(-2) + '학번';
+      return s ? (s + '학번') : '-';
+    }
+
+    function setBatteryEl(val, barEl, pctEl){
+      const v = Math.max(0, Math.min(100, Math.round(val)));
+      if (pctEl) pctEl.textContent = v + '%';
+      if (barEl) {
+        barEl.style.width = v + '%';
+        barEl.classList.remove('bg-red-500','bg-amber-500','bg-emerald-500');
+        if(v < 30) barEl.classList.add('bg-red-500');
+        else if(v < 70) barEl.classList.add('bg-amber-500');
+        else barEl.classList.add('bg-emerald-500');
+      }
+    }
+
+    function openUserProfile(user){
+      document.getElementById('pubNickname').textContent = user.nickname ?? '-';
+      document.getElementById('pubDept').textContent     = user.dept ?? '-';
+      document.getElementById('pubSid').textContent      = formatSid(user.sid ?? '-');
+      document.getElementById('pubGender').textContent   = user.gender ?? '-';
+      setBatteryEl(user.battery ?? 60,
+        document.getElementById('pubBatteryBar'),
+        document.getElementById('pubBatteryPct'));
+      // 신고/차단 버튼에 대상 싣기
+      const pr = document.getElementById('pubReportBtn');
+      if (pr) pr.setAttribute('data-user', JSON.stringify(user));
+
+      const pb = document.getElementById('pubBlockBtn');
+      if (pb) {
+        pb.onclick = () => {
+          blocked.add((user.nickname || '').trim());
+          applyBlockFilter();            // 홈 목록에서 차단 사용자 글 숨기기
+          alert('차단되었습니다.');
+        };
+      }
+      show('profile-public');
+    }
+
+    function getDetailUser(){
+      try { return JSON.parse(detail?.dataset.user || '{}'); }
+      catch { return {}; }
+    }
+
+    // 이벤트 위임: data-open-profile="detail" 요소(닉네임 버튼) 클릭
+    document.addEventListener('click', (e)=>{
+      const target = e.target.closest('[data-open-profile="detail"]');
+      if(!target) return;
+      e.preventDefault();
+      openUserProfile(getDetailUser());
+    });
+
+    // === 신고/차단 상태 저장(프론트엔드-only) ===
+    const reports = [];        // { targetNickname, reason, notes, ts }
+    const blocked = new Set(); // 닉네임 집합
+
+    // 홈 피드에서 차단 사용자 글 숨기기
+    function applyBlockFilter() {
+      const home = document.getElementById('home');
+      if (!home) return;
+
+      home.querySelectorAll('[data-open-detail]').forEach(h3 => {
+        let data = {};
+        try { data = JSON.parse(h3.getAttribute('data-detail') || '{}'); } catch {}
+        const nick = (data?.authorUser?.nickname || data?.author || '').trim();
+        const article = h3.closest('article');
+        if (!article) return;
+
+        if (nick && blocked.has(nick)) {
+          article.classList.add('hidden');
+        } else {
+          article.classList.remove('hidden');
+        }
+      });
+    }
+
+    let currentReportUser = null; // {nickname, dept, sid, gender, battery}
+
+    function openReport(user) {
+      currentReportUser = user || {};
+      const trg = document.getElementById('reportTarget');
+      if (trg) trg.textContent = user?.nickname || '-';
+
+      // 폼 초기화
+      const notes = document.getElementById('reportNotes');
+      if (notes) notes.value = '';
+      const blk = document.getElementById('reportBlock');
+      if (blk) blk.checked = false;
+
+      show('report');
+    }
+
+    // data-open-report 클릭 시 신고 화면 열기
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-open-report]');
+      if (!btn) return;
+      e.preventDefault();
+
+      let user = null;
+      // 1) 버튼 자체에 data-user가 있으면 우선 사용
+      try { user = JSON.parse(btn.getAttribute('data-user') || '{}'); } catch {}
+
+      // 2) 없으면 상세 화면의 dataset.user 사용
+      if (!user || !user.nickname) {
+        const d = document.getElementById('detail');
+        try { user = JSON.parse(d?.dataset?.user || '{}'); } catch {}
+      }
+
+      openReport(user || {});
+    });
+
+    document.getElementById('reportForm')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentReportUser) return;
+
+      const reason = (document.querySelector('input[name="reason"]:checked')?.value) || '기타';
+      const notes  = document.getElementById('reportNotes').value.trim();
+      const alsoBlock = document.getElementById('reportBlock').checked;
+
+      reports.push({
+        targetNickname: currentReportUser.nickname || '-',
+        reason,
+        notes,
+        ts: Date.now()
+      });
+
+      if (alsoBlock && currentReportUser.nickname) {
+        blocked.add(currentReportUser.nickname.trim());
+        applyBlockFilter();
+      }
+
+      alert('신고가 접수되었습니다.');
+      openUserProfile(currentReportUser); // 신고 후 대상 프로필로 복귀
+    });
+  </script>
+</body>
+</html>
